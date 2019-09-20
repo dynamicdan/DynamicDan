@@ -1,4 +1,4 @@
-# this website is currently meditating - thus the clear mind/page
+## – this website is currently meditating - thus the clear mind/page
 
 To enhance your calm, try reading some of these quotes:
 
