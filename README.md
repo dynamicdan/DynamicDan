@@ -13,4 +13,4 @@ To enhance your calm, try reading some of these quotes:
  
 > "You take your life in your own hands, and what happens? A terrible thing, no one to blame." — Erica Jong
  
-<a href="/files/test.txt" download="download">Download My CV</a>
+<a href="/files/DanielPettet.pdf" download="download">Download My CV</a>
