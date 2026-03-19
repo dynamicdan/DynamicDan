@@ -12,6 +12,6 @@ To enhance your calm, try reading some of these quotes:
 > "What the caterpillar calls the end, the rest of the world calls a butterfly." — Lao Tzu
  
  
-> "You take your life in your own hands, and what happens? A terrible thing, no one to blame." — Erica Jong.
+> "You take your life in your own hands, and what happens? A terrible thing, no one to blame." — Erica Jong
  
 
