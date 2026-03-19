@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COLOR WARS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: #13131a;
+    --border: #1e1e2e;
+    --text: #e8e8f0;
+    --dim: #555577;
+    --c1: #ff3a5c;
+    --c2: #3af0ff;
+    --c3: #f0c030;
+    --c4: #50e060;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 8px 32px;
+    overflow-x: hidden;
+  }
+
+  /* ════ SETUP ════ */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 95vh;
+    gap: 36px;
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 14vw, 108px);
+    letter-spacing: 6px;
+    line-height: 1;
+    background: linear-gradient(120deg, var(--c1) 0%, var(--c2) 55%, var(--c3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: logoPulse 4s ease-in-out infinite;
+  }
+  @keyframes logoPulse {
+    0%,100% { filter: brightness(1) drop-shadow(0 0 16px rgba(58,240,255,0.3)); }
+    50%      { filter: brightness(1.15) drop-shadow(0 0 32px rgba(255,58,92,0.5)); }
+  }
+  .tagline {
+    font-size: 13px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--dim); margin-top: -28px;
+  }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 18px; padding: 36px 40px;
+    width: 100%; display: flex; flex-direction: column; gap: 26px;
+  }
+  .card-label {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--dim); font-weight: 700; text-align: center; margin-bottom: 4px;
+  }
+
+  .btn-row { display: flex; gap: 10px; justify-content: center; }
+  .seg-btn {
+    flex: 1; max-width: 80px; height: 64px; border-radius: 12px;
+    border: 2px solid var(--border); background: var(--bg); color: var(--dim);
+    font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .seg-btn:hover { border-color: #444466; color: var(--text); }
+  .seg-btn.active {
+    background: rgba(58,240,255,0.08); border-color: var(--c2);
+    color: var(--c2); box-shadow: 0 0 18px rgba(58,240,255,0.25);
+  }
+
+  .names-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .name-row { display: flex; align-items: center; gap: 10px; }
+  .name-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .name-input {
+    flex: 1; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 13px; color: var(--text);
+    font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600;
+    outline: none; transition: border-color 0.15s;
+  }
+  .name-input:focus { border-color: #444466; }
+
+  .size-row { display: flex; align-items: center; justify-content: space-between; }
+  .size-btns { display: flex; gap: 8px; }
+  .sz-btn {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--dim); font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .sz-btn:hover { color: var(--text); border-color: #444466; }
+  .sz-btn.active { border-color: var(--c3); color: var(--c3); background: rgba(240,192,48,0.07); }
+
+  .start-btn {
+    width: 100%; padding: 17px; border-radius: 12px; border: none;
+    background: linear-gradient(130deg, var(--c1) 0%, #c020e0 60%, var(--c2) 100%);
+    color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+    letter-spacing: 5px; cursor: pointer; transition: all 0.2s;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,58,92,0.35); }
+
+  /* ════ GAME SCREEN ════ */
+  #game-screen {
+    display: none; flex-direction: column; align-items: center;
+    gap: 12px; width: 100%; max-width: 700px;
+  }
+
+  .g-header { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .g-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 5px;
+    background: linear-gradient(120deg, var(--c1), var(--c2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hdr-btns { display: flex; gap: 8px; }
+  .hdr-btn {
+    padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--dim); font-family: 'Rajdhani', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    text-transform: uppercase; transition: all 0.15s;
+  }
+  .hdr-btn:hover { color: var(--text); border-color: #444466; }
+  .hdr-btn.active { color: var(--c3); border-color: var(--c3); background: rgba(240,192,48,0.08); }
+
+  /* Debug count overlay */
+  .debug-count {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .debug-count .cap { font-size: 11px; opacity: 0.6; }
+
+  .scoreboard { width: 100%; display: flex; gap: 8px; flex-wrap: wrap; }
+  .sc-card {
+    flex: 1; min-width: 110px; background: var(--panel);
+    border: 2px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .sc-card.active {
+    box-shadow: 0 0 22px color-mix(in srgb, var(--pc) 45%, transparent);
+    border-color: var(--pc);
+  }
+  .sc-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; font-weight: 500;
+    text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;
+  }
+  .sc-cells {
+    font-family: 'DM Mono', monospace;
+    font-size: 38px; font-weight: 500; letter-spacing: -1px; line-height: 1;
+  }
+  .sc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; opacity: 0.4; letter-spacing: 1px; margin-top: 2px;
+  }
+  .sc-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 1px;
+    margin-top: 5px; opacity: 0.75;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .sc-streak-icon { font-size: 10px; }
+  .sc-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .sc-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+  .turn-bar {
+    width: 100%; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .turn-left { display: flex; align-items: center; gap: 10px; }
+  .turn-pip { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .turn-who { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .turn-sub { font-size: 11px; color: var(--dim); letter-spacing: 1px; text-align: right; max-width: 55%; }
+
+  /* ════ BOARD ════ */
+  .board-wrap { width: 100%; display: flex; justify-content: center; }
+  #board { display: grid; gap: 3px; border-radius: 10px; overflow: hidden; }
+
+  .cell {
+    border-radius: 5px;
+    background: #0e0e18;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    border: 1px solid #16162a;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .cell:hover { filter: brightness(1.3); }
+  .cell.owned:hover { filter: brightness(1.2); }
+
+  /* dot display */
+  .orb-wrap {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    pointer-events: none;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Flying orb overlay — sits over the board during explosions */
+  .board-wrap { position: relative; }
+  .flying-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    transition: none;
+  }
+
+  /* ════ ANIMATIONS ════ */
+  @keyframes cellBurst {
+    0%   { transform: scale(1);    filter: brightness(1); }
+    25%  { transform: scale(1.38); filter: brightness(3); }
+    60%  { transform: scale(0.9); }
+    100% { transform: scale(1);    filter: brightness(1); }
+  }
+  .anim-burst { animation: cellBurst 0.66s ease-out forwards; }
+
+  /* ════ OVERLAYS ════ */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88); z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .overlay.show { display: flex; }
+  .overlay-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 18px; padding: 40px 48px;
+    max-width: 500px; width: 90%;
+    display: flex; flex-direction: column; gap: 18px;
+    animation: popIn 0.32s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.75); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+  .ov-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 5px; }
+  .win-winner { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 3px; line-height: 1; }
+  .win-subtitle { font-size: 15px; color: var(--dim); letter-spacing: 1px; }
+  .result-list { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+  .result-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg); border-radius: 8px; padding: 9px 13px;
+    font-size: 14px; font-weight: 600;
+  }
+  .result-name { display: flex; align-items: center; gap: 8px; }
+  .result-pip { width: 9px; height: 9px; border-radius: 50%; }
+  .result-val { color: var(--dim); }
+  .ov-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .ov-btn {
+    flex: 1; padding: 13px; border-radius: 10px; border: none;
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .ov-btn-primary { background: linear-gradient(130deg, var(--c1), var(--c2)); color: #fff; }
+  .ov-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,58,92,0.4); }
+  .ov-btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--dim); }
+  .ov-btn-secondary:hover { color: var(--text); border-color: #444466; }
+  .rules-body { line-height: 1.9; color: var(--dim); font-size: 14px; }
+  .rules-body strong { color: var(--text); font-weight: 700; }
+  .rules-body p { margin-bottom: 10px; }
+
+  @media (max-width: 500px) {
+    .overlay-card { padding: 28px 22px; }
+    .card { padding: 28px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SETUP ══════════════ -->
+<div id="setup-screen">
+  <div style="text-align:center">
+    <div class="logo">COLOR WARS</div>
+    <div class="tagline">Chain Reaction</div>
+  </div>
+  <div class="card">
+    <div>
+      <div class="card-label">Number of Players</div>
+      <div class="btn-row">
+        <button class="seg-btn active" data-n="2">2</button>
+        <button class="seg-btn" data-n="3">3</button>
+        <button class="seg-btn" data-n="4">4</button>
+      </div>
+    </div>
+    <div class="names-wrap" id="names-wrap"></div>
+    <div class="size-row">
+      <span class="card-label" style="margin:0">Board Size</span>
+      <div class="size-btns">
+        <button class="sz-btn" data-sz="5">5×5</button>
+        <button class="sz-btn active" data-sz="8">8×8</button>
+        <button class="sz-btn" data-sz="12">12×12</button>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn">START GAME</button>
+  </div>
+</div>
+
+<!-- ══════════════ GAME ══════════════ -->
+<div id="game-screen">
+  <div class="g-header">
+    <div class="g-title">COLOR WARS</div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" id="debug-btn">DEBUG</button>
+      <button class="hdr-btn" id="rules-btn">RULES</button>
+      <button class="hdr-btn" id="menu-btn">MENU</button>
+    </div>
+  </div>
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="turn-bar">
+    <div class="turn-left">
+      <div class="turn-pip" id="turn-pip"></div>
+      <div class="turn-who" id="turn-who"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <div class="turn-sub" id="turn-sub"></div>
+      <div class="turn-sub" id="turn-streak" style="display:none;color:var(--c3)"></div>
+    </div>
+  </div>
+  <div class="board-wrap"><div id="board"></div></div>
+</div>
+
+<!-- ══════════════ WIN ══════════════ -->
+<div class="overlay" id="win-overlay">
+  <div class="overlay-card">
+    <div class="ov-title" style="color:var(--dim)">WINNER</div>
+    <div class="win-winner" id="win-name"></div>
+    <div class="win-subtitle" id="win-sub"></div>
+    <div class="result-list" id="win-results"></div>
+    <div class="ov-actions">
+      <button class="ov-btn ov-btn-primary" id="again-btn">PLAY AGAIN</button>
+      <button class="ov-btn ov-btn-secondary" id="win-menu-btn">MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RULES ══════════════ -->
+<div class="overlay" id="rules-overlay">
+  <div class="overlay-card">
+    <div class="ov-title" style="color:var(--c2)">HOW TO PLAY</div>
+    <div class="rules-body">
+      <p><strong>SETUP</strong><br>
+      The grid starts empty. Each player clicks any empty cell to place their first orb (1 dot).</p>
+      <p><strong>YOUR TURN</strong><br>
+      Click any empty cell to start there, or click one of your own cells to add a dot to it.</p>
+      <p><strong>EXPLOSIONS</strong><br>
+      Each cell has a capacity equal to its number of neighbours (corners = 2, edges = 3, centre = 4). When a cell reaches capacity it explodes — it clears and fires one orb in each direction. Each neighbour gains +1 dot.</p>
+      <p><strong>TAKEOVERS</strong><br>
+      If an exploding orb lands on an opponent's cell, that cell becomes yours and its count increases by 1. This can trigger chain reactions!</p>
+      <p><strong>WIN</strong><br>
+      The game ends when only one player has cells remaining. That player wins!</p>
+    </div>
+    <button class="ov-btn ov-btn-secondary" id="close-rules-btn">CLOSE</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  COLOR WARS  —  Chain Reaction
+// ═══════════════════════════════════════════════════════════
+
+const PCOLOR  = ['#ff3a5c','#3af0ff','#f0c030','#50e060'];
+const PNAMES  = ['ALPHA','BRAVO','CHARLIE','DELTA'];
+
+let debugMode = false;
+
+// ── Setup wiring ────────────────────────────────────────────
+let setupN = 2, setupSz = 8;
+
+function renderSetupNames() {
+  const wrap = document.getElementById('names-wrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < setupN; i++) {
+    const row = document.createElement('div');
+    row.className = 'name-row';
+    const dot = document.createElement('div');
+    dot.className = 'name-dot';
+    dot.style.background = PCOLOR[i];
+    const inp = document.createElement('input');
+    inp.className = 'name-input';
+    inp.type = 'text'; inp.maxLength = 12;
+    inp.placeholder = PNAMES[i]; inp.id = `pname${i}`;
+    row.appendChild(dot); row.appendChild(inp);
+    wrap.appendChild(row);
+  }
+}
+renderSetupNames();
+
+document.querySelectorAll('.seg-btn').forEach(b => b.addEventListener('click', () => {
+  setupN = +b.dataset.n;
+  document.querySelectorAll('.seg-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  renderSetupNames();
+}));
+document.querySelectorAll('.sz-btn').forEach(b => b.addEventListener('click', () => {
+  setupSz = +b.dataset.sz;
+  document.querySelectorAll('.sz-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+document.getElementById('start-btn').addEventListener('click', initGame);
+document.getElementById('menu-btn').addEventListener('click', goMenu);
+document.getElementById('debug-btn').addEventListener('click', () => {
+  debugMode = !debugMode;
+  document.getElementById('debug-btn').classList.toggle('active', debugMode);
+  if (G) renderBoard();
+});
+document.getElementById('rules-btn').addEventListener('click', () => document.getElementById('rules-overlay').classList.add('show'));
+document.getElementById('close-rules-btn').addEventListener('click', () => document.getElementById('rules-overlay').classList.remove('show'));
+document.getElementById('rules-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) e.currentTarget.classList.remove('show'); });
+document.getElementById('again-btn').addEventListener('click', () => { document.getElementById('win-overlay').classList.remove('show'); initGame(); });
+document.getElementById('win-menu-btn').addEventListener('click', () => { document.getElementById('win-overlay').classList.remove('show'); goMenu(); });
+
+function goMenu() {
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('game-screen').style.display  = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════
+
+/*
+  grid[r][c] = { owner: -1..n-1, count: 0..cap }
+  phase: 'place' (each player must place 1st orb) | 'play'
+*/
+let G = null;
+let busy = false;   // blocks input during animations
+
+function initGame() {
+  const sz = setupSz, n = setupN;
+  const names = Array.from({length:n}, (_,i) => {
+    const v = (document.getElementById(`pname${i}`)?.value||'').trim();
+    return v || PNAMES[i];
+  });
+
+  G = {
+    sz, n, names,
+    grid: Array.from({length:sz}, () => Array.from({length:sz}, () => ({owner:-1, count:0}))),
+    current: 0,
+    placed:  new Array(n).fill(false),
+    phase:   'place',
+    turn:    1,
+    over:    false,
+    bestStreak: new Array(n).fill(0),   // highest chain streak per player
+    lastStreak: 0,                       // streak count of the most recent turn
+  };
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'flex';
+
+  layoutBoard();
+  renderBoard();
+  renderScoreboard();
+  renderTurnBar();
+}
+
+// ── Board layout (cell size from container width) ────────────
+function cellSize() {
+  const wrap  = document.querySelector('.board-wrap');
+  const avail = Math.min(wrap.clientWidth || 400, window.innerHeight * 0.58);
+  return Math.floor((avail - (G.sz - 1) * 3) / G.sz);
+}
+
+function layoutBoard() {
+  const board = document.getElementById('board');
+  const cs    = cellSize();
+  board.style.gridTemplateColumns = `repeat(${G.sz}, ${cs}px)`;
+  G.cs = cs;
+}
+
+window.addEventListener('resize', () => { if (G && !G.over) { layoutBoard(); renderBoard(); } });
+
+// ── Full board render ────────────────────────────────────────
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  for (let r = 0; r < G.sz; r++)
+    for (let c = 0; c < G.sz; c++)
+      board.appendChild(buildCell(r, c));
+}
+
+// ── Build one cell element ───────────────────────────────────
+function buildCell(r, c) {
+  const {owner, count} = G.grid[r][c];
+  const cs  = G.cs || cellSize();
+  const sz  = G.sz;
+  const cap = capacity(r, c, sz);
+  const el  = document.createElement('div');
+  el.className = 'cell' + (owner >= 0 ? ' owned' : '');
+  el.style.width  = cs + 'px';
+  el.style.height = cs + 'px';
+  el.dataset.r = r; el.dataset.c = c;
+
+  if (owner >= 0) {
+    const col = PCOLOR[owner];
+    el.style.background   = hexAlpha(col, 0.15);
+    el.style.borderColor  = hexAlpha(col, 0.4);
+    if (count >= 1) el.appendChild(buildOrbs(Math.min(count, 3), col, cs));
+  }
+
+  // Debug overlay: show raw count / capacity on every cell
+  if (debugMode) {
+    const lbl = document.createElement('div');
+    lbl.className = 'debug-count';
+    if (owner >= 0) {
+      lbl.innerHTML = `${count}<span class="cap">/${cap}</span>`;
+      lbl.style.color = PCOLOR[owner];
+    } else {
+      lbl.innerHTML = `<span class="cap">${cap}</span>`;
+      lbl.style.color = 'rgba(255,255,255,0.25)';
+    }
+    el.appendChild(lbl);
+  }
+
+  el.addEventListener('click', onCellClick);
+  return el;
+}
+
+// ── Orb dot layout ───────────────────────────────────────────
+//  1 dot  → centre
+//  2 dots → diagonal pair
+//  3 dots → triangle
+//  4 dots → explodes, never rendered
+const DOT_POSITIONS = {
+  1: [[50, 50]],
+  2: [[30, 30],[70, 70]],
+  3: [[30, 30],[70, 30],[50, 70]],
+};
+
+function buildOrbs(count, color, cs) {
+  const wrap = document.createElement('div');
+  wrap.className = 'orb-wrap';
+  const ds  = Math.max(6, Math.round(cs * 0.19));
+  const pts = DOT_POSITIONS[Math.min(count, 3)] || DOT_POSITIONS[1];
+  pts.forEach(([px, py]) => {
+    const d = document.createElement('div');
+    d.className = 'orb';
+    d.style.width  = ds + 'px';
+    d.style.height = ds + 'px';
+    d.style.background  = color;
+    d.style.boxShadow   = `0 0 ${Math.round(ds*0.8)}px ${color}`;
+    d.style.left = px + '%';
+    d.style.top  = py + '%';
+    wrap.appendChild(d);
+  });
+  return wrap;
+}
+
+// ── Patch single cell in DOM ─────────────────────────────────
+function patchCell(r, c) {
+  const board = document.getElementById('board');
+  const idx   = r * G.sz + c;
+  board.replaceChild(buildCell(r, c), board.children[idx]);
+}
+
+// ── Scoreboard ───────────────────────────────────────────────
+function countCells(pi) {
+  let n = 0;
+  for (let r = 0; r < G.sz; r++)
+    for (let c = 0; c < G.sz; c++)
+      if (G.grid[r][c].owner === pi) n++;
+  return n;
+}
+
+function renderScoreboard() {
+  const total = G.sz * G.sz;
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = '';
+  G.names.forEach((name, i) => {
+    const cells  = countCells(i);
+    const pct    = (cells / total * 100).toFixed(0);
+    const best   = G.bestStreak[i];
+    const card   = document.createElement('div');
+    card.className = 'sc-card' + (i === G.current ? ' active' : '');
+    card.style.setProperty('--pc', PCOLOR[i]);
+    card.innerHTML = `
+      <div class="sc-name" style="color:${PCOLOR[i]}">${name}</div>
+      <div class="sc-cells" style="color:${PCOLOR[i]}">${cells}</div>
+      <div class="sc-label" style="color:${PCOLOR[i]}">${pct}% of board</div>
+      ${best > 0 ? `<div class="sc-streak" style="color:${PCOLOR[i]}"><span class="sc-streak-icon">⚡</span>best chain: ${best}</div>` : ''}
+      <div class="sc-bar">
+        <div class="sc-bar-fill" style="width:${pct}%;background:${PCOLOR[i]}"></div>
+      </div>`;
+    sb.appendChild(card);
+  });
+}
+
+// ── Turn bar ─────────────────────────────────────────────────
+function renderTurnBar() {
+  const p = G.current;
+  const pip = document.getElementById('turn-pip');
+  const who = document.getElementById('turn-who');
+  const sub = document.getElementById('turn-sub');
+  const streakEl = document.getElementById('turn-streak');
+  pip.style.background = PCOLOR[p];
+  pip.style.boxShadow  = `0 0 10px ${PCOLOR[p]}`;
+  who.style.color = PCOLOR[p];
+  who.textContent = `${G.names[p]}'S TURN`;
+  sub.textContent = G.phase === 'place' && !G.placed[p]
+    ? 'PLACE YOUR FIRST ORB'
+    : `TURN ${G.turn}`;
+  if (G.lastStreak > 0) {
+    streakEl.style.display = 'block';
+    streakEl.textContent = `⚡ ${G.lastStreak}-chain last turn`;
+  } else {
+    streakEl.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════
+
+function onCellClick(e) {
+  if (busy || G.over) return;
+  const r = +e.currentTarget.dataset.r;
+  const c = +e.currentTarget.dataset.c;
+  const cell = G.grid[r][c];
+  const p    = G.current;
+
+  if (G.phase === 'place') {
+    // Must click an empty cell
+    if (cell.owner !== -1) return;
+    // Start with capacity-1 dots (one away from exploding)
+    cell.owner = p;
+    cell.count = capacity(r, c, G.sz) - 1;
+    patchCell(r, c);
+    sfx.place();
+    G.placed[p] = true;
+    if (G.placed.every(Boolean)) G.phase = 'play';
+    nextTurn();
+    return;
+  }
+
+  // Normal play: ONLY your own cells — no clicking empty cells
+  if (cell.owner !== p) return;
+
+  busy = true;
+  cell.owner = p;
+  cell.count += 1;
+  sfx.add();
+  patchCell(r, c);
+
+  resolveExplosions().then(() => {
+    busy = false;
+    if (!checkGameOver()) nextTurn();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHAIN REACTION ENGINE
+// ═══════════════════════════════════════════════════════════
+
+function capacity(r, c, sz) {
+  return 4;
+}
+
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+
+async function resolveExplosions() {
+  const streakCount = await explodeWaves();
+  // streakCount = number of chain waves that fired (0 = no explosion)
+  G.lastStreak = streakCount;
+  if (streakCount > 0) {
+    const p = G.current;
+    if (streakCount > G.bestStreak[p]) G.bestStreak[p] = streakCount;
+  }
+}
+
+// Returns the pixel centre of cell (r,c) relative to .board-wrap
+function cellCentre(r, c) {
+  const board = document.getElementById('board');
+  const wrap  = document.querySelector('.board-wrap');
+  const idx   = r * G.sz + c;
+  const el    = board.children[idx];
+  if (!el) return {x:0, y:0};
+  const br = el.getBoundingClientRect();
+  const wr = wrap.getBoundingClientRect();
+  return {
+    x: br.left - wr.left + br.width  / 2,
+    y: br.top  - wr.top  + br.height / 2,
+  };
+}
+
+// Animate a single orb flying from (sx,sy) to (tx,ty) over the board overlay
+function flyOrb(color, sx, sy, tx, ty, duration) {
+  const wrap = document.querySelector('.board-wrap');
+  const orb  = document.createElement('div');
+  const ds   = Math.max(7, Math.round(G.cs * 0.2));
+  orb.className = 'flying-orb';
+  orb.style.cssText = `
+    width:${ds}px; height:${ds}px;
+    background:${color};
+    box-shadow: 0 0 ${Math.round(ds*0.9)}px ${color}, 0 0 ${Math.round(ds*1.8)}px ${color}55;
+    left:${sx}px; top:${sy}px;
+  `;
+  wrap.appendChild(orb);
+
+  orb.animate([
+    { transform: 'translate(-50%,-50%) scale(1)',   opacity: 1,   left: sx+'px', top: sy+'px' },
+    { transform: 'translate(-50%,-50%) scale(0.85)',opacity: 0.9, left: tx+'px', top: ty+'px', offset: 0.8 },
+    { transform: 'translate(-50%,-50%) scale(0)',   opacity: 0,   left: tx+'px', top: ty+'px' },
+  ], { duration, easing: 'cubic-bezier(0.25,0.46,0.45,0.94)', fill: 'forwards' })
+    .finished.then(() => orb.remove());
+}
+
+async function explodeWaves() {
+  const {sz, grid} = G;
+  const FLIGHT = 660;
+  let chainWave = 0;
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+
+    // ── Step 1: snapshot every cell that is at or above capacity ──
+    const exploding = [];
+    for (let r = 0; r < sz; r++)
+      for (let c = 0; c < sz; c++) {
+        const cell = grid[r][c];
+        if (cell.owner >= 0 && cell.count >= capacity(r, c, sz))
+          exploding.push([r, c, cell.owner]);
+      }
+
+    if (exploding.length === 0) break;
+    changed = true;
+
+    // ── Step 2: atomically clear all exploding cells & launch orbs ──
+    // We still track which cells are exploding this wave so we can
+    // reset their count to 0 before neighbours add incoming orbs.
+    // NOTE: we do NOT skip adding incoming orbs to a just-cleared cell —
+    // those orbs are valid and will be applied after the clear.
+    const explodingSet = new Set(exploding.map(([r,c]) => r * sz + c));
+
+    for (const [r, c, blastOwner] of exploding) {
+      const colour = PCOLOR[blastOwner];
+      const src    = cellCentre(r, c);
+
+      // Burst flash
+      const board = document.getElementById('board');
+      const srcEl = board.children[r * sz + c];
+      if (srcEl) {
+        srcEl.classList.remove('anim-burst');
+        void srcEl.offsetWidth;
+        srcEl.classList.add('anim-burst');
+      }
+
+      // Launch flying orbs toward each valid neighbour
+      for (const [dr, dc] of DIRS) {
+        const nr = r+dr, nc = c+dc;
+        if (nr < 0 || nr >= sz || nc < 0 || nc >= sz) continue;
+        flyOrb(colour, src.x, src.y, cellCentre(nr, nc).x, cellCentre(nr, nc).y, FLIGHT);
+      }
+
+      sfx.explode(blastOwner);
+
+      // Clear this cell — owner and count both reset
+      grid[r][c] = { owner: -1, count: 0 };
+      patchCell(r, c);
+    }
+
+    // ── Step 3: accumulate incoming orbs into a delta map ────────
+    // Key: r*sz+c → { owner, count }
+    // Cells that just exploded (explodingSet) get their count reset to 0
+    // before receiving incoming — this is the fix for the stale-count bug.
+    const delta = new Map();
+
+    for (const [r, c, blastOwner] of exploding) {
+      for (const [dr, dc] of DIRS) {
+        const nr = r+dr, nc = c+dc;
+        if (nr < 0 || nr >= sz || nc < 0 || nc >= sz) continue;
+        const key = nr * sz + nc;
+        if (!delta.has(key)) delta.set(key, { owner: blastOwner, count: 0 });
+        const entry = delta.get(key);
+        entry.count += 1;
+        entry.owner  = blastOwner; // last blastOwner wins (standard chain-reaction rule)
+      }
+    }
+
+    // Wait for orbs to arrive
+    await sleep(FLIGHT + 60);
+
+    // ── Step 4: apply delta atomically ───────────────────────────
+    let captured = false;
+    for (const [key, {owner: blastOwner, count: incoming}] of delta) {
+      const nr = Math.floor(key / sz);
+      const nc = key % sz;
+      const cell = grid[nr][nc];
+
+      if (cell.owner >= 0 && cell.owner !== blastOwner) captured = true;
+
+      // If this cell just exploded this wave, its count was reset to 0 —
+      // incoming orbs start fresh on the cleared cell.
+      // If it did NOT explode, its existing dots are preserved and incoming adds on top.
+      const base = explodingSet.has(key) ? 0 : cell.count;
+      cell.owner = blastOwner;
+      cell.count = base + incoming;
+      patchCell(nr, nc);
+    }
+
+    if (captured) sfx.capture();
+
+    // Play escalating D-major chord note for this chain wave
+    sfx.chainWave(chainWave);
+    chainWave++;
+
+    await sleep(180);
+  }
+  return chainWave; // total waves fired
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════════════════════════
+//  TURN / WIN LOGIC
+// ═══════════════════════════════════════════════════════════
+
+function nextTurn() {
+  G.turn++;
+  const allPlaced = G.placed.every(Boolean);
+  let next = (G.current + 1) % G.n;
+
+  if (allPlaced) {
+    // Skip eliminated players
+    for (let i = 0; i < G.n; i++) {
+      if (countCells(next) > 0) break;
+      next = (next + 1) % G.n;
+    }
+  }
+
+  G.current = next;
+  renderScoreboard();
+  renderTurnBar();
+  sfx.turnChange(G.current);
+}
+
+function checkGameOver() {
+  if (!G.placed.every(Boolean)) return false;
+
+  const alive = [];
+  for (let i = 0; i < G.n; i++)
+    if (countCells(i) > 0) alive.push(i);
+
+  if (alive.length > 1) return false;
+
+  G.over = true;
+  const winner = alive.length === 1 ? alive[0] : G.current;
+  showWin(winner);
+  return true;
+}
+
+function showWin(wi) {
+  const total = G.sz * G.sz;
+  document.getElementById('win-name').textContent = G.names[wi];
+  document.getElementById('win-name').style.color  = PCOLOR[wi];
+  const wc = countCells(wi);
+  document.getElementById('win-sub').textContent  = `${wc} cells  ·  ${((wc/total)*100).toFixed(1)}% of board`;
+
+  const results = Array.from({length:G.n}, (_,i) => ({
+    i, name: G.names[i], color: PCOLOR[i],
+    cells: countCells(i),
+    streak: G.bestStreak[i],
+  })).sort((a,b) => b.cells - a.cells);
+
+  const list = document.getElementById('win-results');
+  list.innerHTML = '';
+
+  // Header row
+  const hdr = document.createElement('div');
+  hdr.className = 'result-row';
+  hdr.style.cssText = 'opacity:0.4;font-size:11px;letter-spacing:1px;padding:6px 13px;';
+  hdr.innerHTML = `<span style="flex:1">PLAYER</span><span style="min-width:60px;text-align:right">CELLS</span><span style="min-width:80px;text-align:right">BEST CHAIN</span>`;
+  list.appendChild(hdr);
+
+  results.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'result-row';
+    row.innerHTML = `
+      <div class="result-name" style="flex:1">
+        <div class="result-pip" style="background:${p.color}"></div>
+        <span style="color:${p.color}">${p.name}</span>
+      </div>
+      <span class="result-val" style="min-width:60px;text-align:right">${p.cells}</span>
+      <span class="result-val" style="min-width:80px;text-align:right">${p.streak > 0 ? '⚡ ' + p.streak : '—'}</span>`;
+    list.appendChild(row);
+  });
+
+  setTimeout(() => { sfx.win(); document.getElementById('win-overlay').classList.add('show'); }, 500);
+}
+
+// ── Utility ──────────────────────────────────────────────────
+function hexAlpha(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  XYLOPHONE SOUND ENGINE  (Web Audio API — no external files)
+//
+//  Each strike = mallet click transient + fundamental + 3 inharmonic
+//  partials tuned to real xylophone bar ratios (×2, ×3.05, ×4.17).
+//  All events use notes from the D major scale so everything sounds
+//  melodic together. Chain reactions rise exactly 1.5 semitones per wave
+//  via the equal-temperament formula: freq × 2^(1.5/12).
+// ═══════════════════════════════════════════════════════════
+
+const sfx = (() => {
+  let ctx = null;
+  function ac() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  // ── Core bar strike ─────────────────────────────────────
+  // Realistic xylophone: fast attack, exponential decay on each partial.
+  // Inharmonic ratios (2.0, 3.05, 4.17) give the warm "woody" overtone
+  // colour of a real rosewood bar.
+  function xylo(freq, vol, when) {
+    const a = ac();
+    const t = a.currentTime + (when || 0);
+
+    // Very short mallet-click transient (highpass-filtered noise)
+    const cLen = Math.ceil(a.sampleRate * 0.014);
+    const cBuf = a.createBuffer(1, cLen, a.sampleRate);
+    const cd   = cBuf.getChannelData(0);
+    for (let i = 0; i < cLen; i++) cd[i] = Math.random() * 2 - 1;
+    const cSrc = a.createBufferSource(); cSrc.buffer = cBuf;
+    const cFlt = a.createBiquadFilter(); cFlt.type = 'highpass'; cFlt.frequency.value = 4000;
+    const cGn  = a.createGain();
+    cGn.gain.setValueAtTime(vol * 0.18, t);
+    cGn.gain.exponentialRampToValueAtTime(0.0001, t + 0.014);
+    cSrc.connect(cFlt); cFlt.connect(cGn); cGn.connect(a.destination);
+    cSrc.start(t); cSrc.stop(t + 0.016);
+
+    // Tonal partials — [ratio, amplitude, decay]
+    const partials = [
+      [1,    1.00, 1.1 ],   // fundamental — longest ring
+      [2,    0.28, 0.55],   // 1st partial (octave)
+      [3.05, 0.14, 0.28],   // 2nd partial (slightly flat twelfth — xylophone characteristic)
+      [4.17, 0.07, 0.16],   // 3rd partial (17th, warm "chime" colour)
+    ];
+    partials.forEach(([ratio, amp, decay]) => {
+      const o = a.createOscillator();
+      const g = a.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq * ratio, t);
+      // Tiny pitch-settle on fundamental (≈1 ms) — mallet-bar interaction
+      if (ratio === 1) o.frequency.exponentialRampToValueAtTime(freq * 0.9985, t + 0.008);
+      g.gain.setValueAtTime(vol * amp * 0.38, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+      o.connect(g); g.connect(a.destination);
+      o.start(t); o.stop(t + decay + 0.04);
+    });
+  }
+
+  // ── Music theory helpers ─────────────────────────────────
+  // Raise a frequency by N semitones (equal temperament)
+  const semitone = n => Math.pow(2, n / 12);
+
+  // D major scale starting at D4 = 293.66 Hz
+  // Intervals: W W H W W W H  (2 2 1 2 2 2 1 semitones)
+  const D4 = 293.66;
+  const D_MAJOR = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24]
+    .map(st => D4 * semitone(st));
+  // D4 E4 F#4 G4 A4 B4 C#5 D5 E5 F#5 G5 A5 B5 C#6 D6
+
+  // Pentatonic subset (D E F# A B) for melodic events
+  const PENTA = [D_MAJOR[0], D_MAJOR[1], D_MAJOR[2], D_MAJOR[4], D_MAJOR[5],
+                 D_MAJOR[7], D_MAJOR[8], D_MAJOR[9], D_MAJOR[11], D_MAJOR[12]];
+
+  // Each player owns a note from D major triads so chords feel resolved
+  // P1=D5, P2=F#5, P3=A5, P4=D6
+  const PLAYER_NOTE = [D_MAJOR[7], D_MAJOR[9], D_MAJOR[11], D_MAJOR[14]];
+
+  // ── Events ──────────────────────────────────────────────
+
+  // Place first orb — rich two-note chord (root + fifth) in player colour
+  function place() {
+    const root = G ? PLAYER_NOTE[G.current] : PLAYER_NOTE[0];
+    xylo(root,              0.85, 0);
+    xylo(root * semitone(7), 0.45, 0.06);  // perfect fifth
+  }
+
+  // Add dot — single note, slightly softer
+  function add() {
+    const root = G ? PLAYER_NOTE[G.current] : PLAYER_NOTE[0];
+    xylo(root, 0.65, 0);
+  }
+
+  // Explode — low chord: root one octave down + minor third above it
+  function explode(playerIdx) {
+    const base = PLAYER_NOTE[playerIdx] * 0.5; // drop octave
+    xylo(base,              0.80, 0);
+    xylo(base * semitone(3), 0.50, 0.04);  // minor third — tense, dramatic
+    xylo(base * semitone(7), 0.35, 0.09);  // fifth resolves the tension
+  }
+
+  // Capture — bright ascending three-note D-major arpeggio
+  function capture() {
+    const base = D_MAJOR[7]; // D5
+    xylo(base,                0.72, 0);
+    xylo(base * semitone(4),  0.78, 0.07); // F#5 (major third)
+    xylo(base * semitone(7),  0.84, 0.14); // A5  (fifth)
+  }
+
+  // Turn change — soft two-note interval, unique per player
+  const TURN_INTERVALS = [
+    [D_MAJOR[7],  D_MAJOR[9]],   // P1: D5 → E5
+    [D_MAJOR[9],  D_MAJOR[11]],  // P2: E5 → F#5
+    [D_MAJOR[11], D_MAJOR[12]],  // P3: F#5 → G5
+    [D_MAJOR[12], D_MAJOR[14]],  // P4: G5 → A5
+  ];
+  function turnChange(playerIdx) {
+    const [lo, hi] = TURN_INTERVALS[playerIdx % 4];
+    xylo(lo, 0.38, 0);
+    xylo(hi, 0.32, 0.07);
+  }
+
+  // Chain wave — each wave rises exactly 1.5 semitones above the last.
+  // Start on D4, multiply by 2^(1.5/12) each step.
+  // A fifth harmony is added from wave 2 onward for richness.
+  function chainWave(waveIndex) {
+    const startFreq = D4;
+    const freq = startFreq * semitone(waveIndex * 1.5);
+    const vol  = Math.min(0.40 + waveIndex * 0.05, 0.92);
+    xylo(freq, vol, 0);
+    if (waveIndex >= 1) xylo(freq * semitone(7), vol * 0.38, 0.04); // fifth
+  }
+
+  // Win — ascending D major scale run, then a final D major chord stab
+  function win() {
+    PENTA.slice(0, 8).forEach((freq, i) => xylo(freq, 0.55 + i * 0.025, i * 0.1));
+    // D major chord: D F# A  (staggered for a warm strum feel)
+    [D_MAJOR[7], D_MAJOR[9], D_MAJOR[11]].forEach((f, i) =>
+      xylo(f, 0.7, 0.85 + i * 0.04)
+    );
+  }
+
+  return { place, add, explode, capture, turnChange, chainWave, win };
+})();
+</script>
+</body>
+</html>
